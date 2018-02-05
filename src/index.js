@@ -21,7 +21,7 @@ const theme = {
     borderRadius: '0.8em',
     baseBorder: '2px solid #efeff3',
     shadow: '0px 0px 30px rgba(0,0,0,0.15)',
-    shadowActive: '0px 0px 30px rgba(0,0,0,0.22)',
+    shadowActive: '0px 0px 30px rgba(0,0,0,0.25)',
 };
 
 const Background = styled.div`
@@ -47,5 +47,5 @@ ReactDOM.render(
 );
 
 injectGlobal`
-  @import url('https://fonts.googleapis.com/css?family=Lato&subset=latin-ext');
+  @import url('https://fonts.googleapis.com/css?family=Lato:400,700&subset=latin-ext');
 `

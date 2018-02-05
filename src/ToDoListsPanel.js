@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
 import {H1, H2, H3} from './Layout';
+import Icon from 'react-icons-kit';
+import {checkmark}  from 'react-icons-kit/icomoon/checkmark';
+import {checkboxUnchecked}  from 'react-icons-kit/icomoon/checkboxUnchecked';
+import {bin}  from 'react-icons-kit/icomoon/bin';
 
 const Avatar = styled.img`
   border-radius: 0px 0px 1em 0px;
@@ -30,7 +34,7 @@ const List = styled.div`
 
 const ListItem = styled.div`
   background-color: white;
-  box-shadow: ${props => props.theme.shadow};
+  box-shadow: ${props => props.active ? props.theme.shadowActive : props.theme.shadow};
   padding: 1em;
   min-width: 140px;
   height: 100px;
@@ -40,6 +44,11 @@ const ListItem = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transform: translate(0, ${props => props.active ? '-0.3em' : '0'});
+  
+  > h2 {
+    font-weight: ${props => props.active ? '700' : '400'};
+  }
   
   &:hover{
     box-shadow: ${props => props.theme.shadowActive};
@@ -71,8 +80,8 @@ const ColorBoxWrapper = styled.div`
 
 class ListsPanel extends Component{
 
-    handleClick(list){
-        this.props.onChangeActiveList(list);
+    handleClick(listIndex){
+        this.props.onChangeActiveList(listIndex);
     }
 
     render() {
@@ -81,9 +90,9 @@ class ListsPanel extends Component{
                 <Avatar src="avatar.jpg"></Avatar>
                 <H3>Lists</H3>
                 <List>
-                    {this.props.lists.map(list =>
-                        <a onClick={() => this.handleClick(list)}>
-                            <ListItem>
+                    {this.props.lists.map((list, listIndex) =>
+                        <a onClick={() => this.handleClick(listIndex)}>
+                            <ListItem active={this.props.activeListIndex === listIndex && true}>
                                 <ColorBoxWrapper><ColorBox color={list.color}></ColorBox></ColorBoxWrapper>
                                 <H2>{list.name}</H2>
                                 <H3>{list.tasks.length} tasks</H3>
@@ -102,22 +111,74 @@ const ToDoItemsWrapper = styled.div`
   padding:0px;
   overflow: auto;
   max-height: 395px;
-  width: 100%;
 `
 
 const ToDoItem = styled.div`
     padding: 1em 0px;
     padding-left: 5em; 
+    display: flex;
+    align-items: center;
     border-bottom: ${props => props.theme.baseBorder};
+    
+    > h2 {
+      text-decoration: ${props => props.done ? 'line-through' : 'none'};
+      color: ${props => props.done ? props.theme.mainGray : props.theme.mainBlack};
+      width: 85%;
+    }
+`
+
+const IconStyled = styled(Icon)`
+    margin-right: 1em;
+    color: ${props => {
+        const color = props.color;
+        if(color === 'red'){
+            return props.theme.redColor
+        } else if(color === 'blue'){
+            return props.theme.blueColor
+        } else if(color === 'green'){
+            return props.theme.greenColor
+        } else if(color === 'violet'){
+            return props.theme.violetColor
+        }
+    }}
+`
+
+const TrashIcon = styled(Icon)`
+  color: ${props => props.theme.mainGray};
+  
+  &:hover{
+   color: ${props => props.theme.mainBlack};
+  }
 `
 
 class ToDoItems extends Component{
+
+    toggleItemState(itemIndex){
+        this.props.handleToggleToDoState(itemIndex);
+    }
+
+    deleteToDoItem(itemIndex){
+        this.props.handleDeleteToDo(itemIndex);
+    }
+
     render() {
+        const list = this.props.list;
         return (
             <ToDoItemsWrapper>
-                {this.props.toDoItems.map(
-                    item => <ToDoItem>
-                        <H2> - {item}</H2>
+                {list.tasks.map(
+                    (item, itemIndex) => <ToDoItem done={item.done}>
+                        <a onClick={() => this.toggleItemState(itemIndex)}>
+                            <IconStyled
+                                color={list.color}
+                                size={16}
+                                icon={item.done ? checkmark : checkboxUnchecked}
+                            ></IconStyled></a>
+                        <H2> {item.text}</H2>
+
+                        <TrashIcon
+                            onClick={() => this.deleteToDoItem(itemIndex)}
+                            icon={bin} size={16}
+                        ></TrashIcon>
                     </ToDoItem>
                 )}
             </ToDoItemsWrapper>
@@ -137,24 +198,33 @@ class ToDoListsPanel extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            activeList: props.toDos[0]
+            activeListIndex: 0,
         }
     }
 
-    changeActiveList(list){
+    changeActiveList(listIndex){
         this.setState({
-            activeList: list
+            activeListIndex: listIndex
         })
     }
 
 
     render() {
+
+        const activeListIndex = this.state.activeListIndex
         return (
             <Wrapper>
-                <ListsPanel lists={this.props.toDos} onChangeActiveList={
-                    (list) => this.changeActiveList(list)
-                }></ListsPanel>
-                <ToDoItems toDoItems={this.state.activeList.tasks}></ToDoItems>
+                <ListsPanel lists={this.props.toDos}
+                            onChangeActiveList={
+                                (listIndex) => this.changeActiveList(listIndex)
+                            }
+                            activeListIndex={activeListIndex}
+                ></ListsPanel>
+                <ToDoItems
+                    list={this.props.toDos[activeListIndex]}
+                    handleToggleToDoState={(todoIndex) => this.props.handleToggleToDoState(activeListIndex, todoIndex)}
+                    handleDeleteToDo={(todoIndex) => this.props.handleDeleteToDo(activeListIndex, todoIndex)}
+                ></ToDoItems>
             </Wrapper>
         );
     }
