@@ -6,19 +6,10 @@ import {checkmark}  from 'react-icons-kit/icomoon/checkmark';
 import {checkboxUnchecked}  from 'react-icons-kit/icomoon/checkboxUnchecked';
 import {bin}  from 'react-icons-kit/icomoon/bin';
 
-const Avatar = styled.img`
-  border-radius: 0px 0px 1em 0px;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 50px;
-  height: auto;
-`
 
 const ListsWrapper = styled.div`
     position: relative;
     padding: 2em;
-    padding-left: 5em;
     padding-bottom: 0px;
     border-bottom: ${props => props.theme.baseBorder};
 `
@@ -55,7 +46,7 @@ const ListItem = styled.div`
   }
 `
 
-const ColorBox = styled.div`
+export const ColorBox = styled.div`
   border-radius: 5px;
   border: 2px solid ${props => {
       const color = props.color;
@@ -87,8 +78,6 @@ class ListsPanel extends Component{
     render() {
         return (
             <ListsWrapper>
-                <Avatar src="avatar.jpg"></Avatar>
-                <H3>Lists</H3>
                 <List>
                     {this.props.lists.map((list, listIndex) =>
                         <a onClick={() => this.handleClick(listIndex)}>
@@ -115,7 +104,7 @@ const ToDoItemsWrapper = styled.div`
 
 const ToDoItem = styled.div`
     padding: 1em 0px;
-    padding-left: 5em; 
+    padding-left: 2em;
     display: flex;
     align-items: center;
     border-bottom: ${props => props.theme.baseBorder};
@@ -195,28 +184,15 @@ const Wrapper = styled.div`
 
 class ToDoListsPanel extends Component {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            activeListIndex: 0,
-        }
-    }
-
-    changeActiveList(listIndex){
-        this.setState({
-            activeListIndex: listIndex
-        })
-    }
-
 
     render() {
 
-        const activeListIndex = this.state.activeListIndex
+        const activeListIndex = this.props.activeListIndex
         return (
             <Wrapper>
                 <ListsPanel lists={this.props.toDos}
                             onChangeActiveList={
-                                (listIndex) => this.changeActiveList(listIndex)
+                                (listIndex) => this.props.changeActiveListIndex(listIndex)
                             }
                             activeListIndex={activeListIndex}
                 ></ListsPanel>

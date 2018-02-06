@@ -82,8 +82,29 @@ class App extends Component {
                   ],
                   color: 'green'
               },
-          ]
+          ],
+            activeListIndex: 0,
+            fullname: 'Richard Mocak',
+
         }
+    }
+
+    changeActiveListIndex(listIndex){
+        this.setState({
+            activeListIndex: listIndex
+        })
+    }
+
+    addToDoItem(toDoText){
+        const lists = this.state.lists;
+        const newTodoItem = {
+            text: toDoText,
+            done: false,
+        }
+        lists[this.state.activeListIndex].tasks.push(newTodoItem);
+        this.setState({
+            lists: lists
+        })
     }
 
 
@@ -114,8 +135,14 @@ class App extends Component {
             toDos={this.state.lists}
             handleToggleToDoState={(listIndex, todoIndex) => this.hadleToggleItemsState(listIndex, todoIndex)}
             handleDeleteToDo={(listIndex, todoIndex) => this.handleDeleteToDoItem(listIndex, todoIndex)}
+            changeActiveListIndex={(listIndex) => this.changeActiveListIndex(listIndex)}
+            activeListIndex={this.state.activeListIndex}
         ></ToDoListsPanel>
-        <CreateToDoListPanel></CreateToDoListPanel>
+        <CreateToDoListPanel
+            createNewToDo={(todoText) => this.addToDoItem(todoText)}
+            fullname={this.state.fullname}
+            activeList={this.state.lists[this.state.activeListIndex]}
+        ></CreateToDoListPanel>
       </Wrapper>
     );
   }

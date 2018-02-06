@@ -48,4 +48,11 @@ ReactDOM.render(
 
 injectGlobal`
   @import url('https://fonts.googleapis.com/css?family=Lato:400,700&subset=latin-ext');
+  
+  input:focus,
+  select:focus,
+  textarea:focus,
+  button:focus {
+    outline: none;
+}
 `
