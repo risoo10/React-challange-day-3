@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import styled from 'styled-components';
 import {H2, H3} from './Layout';
 import {ColorBox} from './ToDoListsPanel'
-
+import fire from "./fire";
 
 const Wrapper = styled.div`
     padding: 2em;
@@ -62,11 +62,18 @@ class CreateToDoListPanel extends Component {
 
     onSubmit(event) {
         event.preventDefault();
-        this.props.createNewToDo(this.state.todoInput);
+        const newTodoItem = {
+            text: this.state.todoInput,
+            done: false,
+        }
+
+        const activeListKey = this.props.activeList.key;
+        const tasksRef = fire.database().ref().child('lists').child(activeListKey).child('tasks');
+        tasksRef.push(newTodoItem);
+
         this.setState({
             todoInput: '',
         })
-
     }
 
     render() {
@@ -74,17 +81,20 @@ class CreateToDoListPanel extends Component {
             <Wrapper>
                 <Avatar src="avatar.jpg"></Avatar>
                 <H3>{this.props.fullname}</H3>
-                <form onSubmit={(event) => this.onSubmit(event)}>
-                    <Input
-                        placeholder="What do you want to do ?"
-                        value={this.state.todoInput}
-                        onChange={(event) => this.onChange(event)}
-                    />
-                </form>
-                <ActiveListWrapper>
-                    <ColorBox color={this.props.activeList.color}></ColorBox>
-                    <H2>{this.props.activeList.name}</H2>
-                </ActiveListWrapper>
+                {this.props.activeList &&
+                <div>
+                    <form onSubmit={(event) => this.onSubmit(event)}>
+                        <Input
+                            placeholder="What do you want to do ?"
+                            value={this.state.todoInput}
+                            onChange={(event) => this.onChange(event)}
+                        />
+                    </form>
+                    <ActiveListWrapper>
+                        <ColorBox color={this.props.activeList.color}></ColorBox>
+                        <H2>{this.props.activeList.name}</H2>
+                    </ActiveListWrapper>
+                </div>}
             </Wrapper>
         );
     }

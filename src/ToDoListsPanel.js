@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
 import styled from 'styled-components';
-import {H1, H2, H3} from './Layout';
+import {H2, H3} from './Layout';
 import Icon from 'react-icons-kit';
 import {checkmark}  from 'react-icons-kit/icomoon/checkmark';
 import {checkboxUnchecked}  from 'react-icons-kit/icomoon/checkboxUnchecked';
 import {bin}  from 'react-icons-kit/icomoon/bin';
+import fire from './fire';
 
 
 const ListsWrapper = styled.div`
@@ -84,7 +85,7 @@ class ListsPanel extends Component{
                             <ListItem active={this.props.activeListIndex === listIndex && true}>
                                 <ColorBoxWrapper><ColorBox color={list.color}></ColorBox></ColorBoxWrapper>
                                 <H2>{list.name}</H2>
-                                <H3>{list.tasks.length} tasks</H3>
+                                <H3>{list.tasks ? list.tasks.length : '0'} tasks</H3>
                             </ListItem>
                         </a>
                     )}
@@ -142,12 +143,18 @@ const TrashIcon = styled(Icon)`
 
 class ToDoItems extends Component{
 
-    toggleItemState(itemIndex){
-        this.props.handleToggleToDoState(itemIndex);
+    toggleItemState(item){
+        // Toggle state change
+        const listKey = this.props.list.key;
+        const taskRef = fire.database().ref().child('lists').child(listKey).child('tasks').child(item.key);
+        taskRef.update({done: !item.done});
     }
 
-    deleteToDoItem(itemIndex){
-        this.props.handleDeleteToDo(itemIndex);
+    deleteToDoItem(item){
+        // Delete item
+        const listKey = this.props.list.key;
+        const taskRef = fire.database().ref().child('lists').child(listKey).child('tasks').child(item.key);
+        taskRef.remove();
     }
 
     render() {
@@ -155,8 +162,8 @@ class ToDoItems extends Component{
         return (
             <ToDoItemsWrapper>
                 {list.tasks.map(
-                    (item, itemIndex) => <ToDoItem done={item.done}>
-                        <a onClick={() => this.toggleItemState(itemIndex)}>
+                    (item) => <ToDoItem done={item.done}>
+                        <a onClick={() => this.toggleItemState(item)}>
                             <IconStyled
                                 color={list.color}
                                 size={16}
@@ -165,7 +172,7 @@ class ToDoItems extends Component{
                         <H2> {item.text}</H2>
 
                         <TrashIcon
-                            onClick={() => this.deleteToDoItem(itemIndex)}
+                            onClick={() => this.deleteToDoItem(item)}
                             icon={bin} size={16}
                         ></TrashIcon>
                     </ToDoItem>
@@ -182,11 +189,17 @@ const Wrapper = styled.div`
   border-right: ${props => props.theme.baseBorder};
 `
 
+const LoadingWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 500px;
+  color: ${props => props.theme.mainGray}; 
+  font-size: ${props => props.theme.h3FontSize};   
+`
+
 class ToDoListsPanel extends Component {
-
-
     render() {
-
         const activeListIndex = this.props.activeListIndex
         return (
             <Wrapper>
@@ -196,11 +209,16 @@ class ToDoListsPanel extends Component {
                             }
                             activeListIndex={activeListIndex}
                 ></ListsPanel>
-                <ToDoItems
-                    list={this.props.toDos[activeListIndex]}
-                    handleToggleToDoState={(todoIndex) => this.props.handleToggleToDoState(activeListIndex, todoIndex)}
-                    handleDeleteToDo={(todoIndex) => this.props.handleDeleteToDo(activeListIndex, todoIndex)}
-                ></ToDoItems>
+                {this.props.toDos[activeListIndex] ?
+                <div>
+                    <ToDoItems
+                        list={this.props.toDos[activeListIndex]}
+                    ></ToDoItems>
+                </div>
+                :
+                <LoadingWrapper>
+                    Loading ...
+                </LoadingWrapper>}
             </Wrapper>
         );
     }

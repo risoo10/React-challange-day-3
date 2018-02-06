@@ -17,7 +17,7 @@ My challange consisted of:
 - CSS styling with Styled Components
 - REACT interactions, components, states
 
-## Day 3 - My to do lists app (delete, toggle)
+## Day 3 - My to do list app (delete, toggle)
 
 
 ## Day 4 - Create new todo item + Firebase 
